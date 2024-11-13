@@ -7,7 +7,7 @@ This guide walks through setting up a private Docker registry with self-signed S
 - Docker installed
 - OpenSSL installed
 - Root/sudo access
-- Docker registry running at registry.blotzy.com:5000
+- Docker registry running at <my-domain-name>:5000
 
 ## 1. Generate SSL Certificates
 
@@ -21,8 +21,8 @@ mkdir -p certs
 openssl req -x509 -newkey rsa:4096 -days 365 -nodes \
   -keyout certs/domain.key \
   -out certs/domain.crt \
-  -subj "/CN=registry.blotzy.com" \
-  -addext "subjectAltName = DNS:registry.blotzy.com,IP:192.168.1.108"
+  -subj "/CN=<my-domain-name>" \
+  -addext "subjectAltName = DNS:<my-domain-name>,IP:<my-ip-address>"
 ```
 
 ## 2. Configure Registry
@@ -68,7 +68,7 @@ docker rm registry
 docker run -d \
   --name registry \
   --restart=always \
-  -p 192.168.1.108:5000:5000 \
+  -p <my-ip-address>:5000:5000 \
   -v $(pwd)/registry-data:/var/lib/registry \
   -v $(pwd)/config.yml:/etc/distribution/config.yml \
   -v $(pwd)/certs:/certs:ro \
@@ -83,12 +83,12 @@ Install the certificates on the machine running Docker:
 
 ```bash
 # Create certificate directories
-sudo mkdir -p /etc/docker/certs.d/registry.blotzy.com:5000
-sudo mkdir -p /etc/docker/certs.d/192.168.1.108:5000
+sudo mkdir -p /etc/docker/certs.d/<my-domain-name>:5000
+sudo mkdir -p /etc/docker/certs.d/<my-ip-address>:5000
 
 # Copy certificates
-sudo cp certs/domain.crt /etc/docker/certs.d/registry.blotzy.com:5000/ca.crt
-sudo cp certs/domain.crt /etc/docker/certs.d/192.168.1.108:5000/ca.crt
+sudo cp certs/domain.crt /etc/docker/certs.d/<my-domain-name>:5000/ca.crt
+sudo cp certs/domain.crt /etc/docker/certs.d/<my-ip-address>:5000/ca.crt
 
 # For Ubuntu/Debian systems, add to system CA store
 sudo cp certs/domain.crt /usr/local/share/ca-certificates/
@@ -120,7 +120,7 @@ Add registry hostname to /etc/hosts if not using DNS:
 
 ```bash
 # Add to /etc/hosts
-sudo bash -c 'echo "192.168.1.108 registry.blotzy.com" >> /etc/hosts'
+sudo bash -c 'echo "<my-ip-address> <my-domain-name>" >> /etc/hosts'
 ```
 
 ## 7. Verify Setup
@@ -129,12 +129,12 @@ Test the registry connection:
 
 ```bash
 # Test with curl
-curl -v --cacert certs/domain.crt https://registry.blotzy.com:5000/v2/_catalog
+curl -v --cacert certs/domain.crt https://<my-domain-name>:5000/v2/_catalog
 
 # Test with Docker
 docker pull hello-world
-docker tag hello-world registry.blotzy.com:5000/hello-world
-docker push registry.blotzy.com:5000/hello-world
+docker tag hello-world <my-domain-name>:5000/hello-world
+docker push <my-domain-name>:5000/hello-world
 ```
 
 ## Maintenance Notes
@@ -164,7 +164,7 @@ openssl x509 -in certs/domain.crt -text -noout
 
 3. Test registry connection:
 ```bash
-curl -v --cacert certs/domain.crt https://registry.blotzy.com:5000/v2/_catalog
+curl -v --cacert certs/domain.crt https://<my-domain-name>:5000/v2/_catalog
 ```
 
 4. Check Docker daemon logs:
