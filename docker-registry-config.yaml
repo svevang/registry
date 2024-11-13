@@ -1,21 +1,21 @@
 version: 0.1
 log:
-  level: info
-  formatter: text
   fields:
     service: registry
-    environment: production
-
 storage:
-  filesystem:
-    rootdirectory: /var/lib/registry
-    maxthreads: 100
-  delete:
-    enabled: true
   cache:
     blobdescriptor: inmemory
-
+  filesystem:
+    rootdirectory: /var/lib/registry
 http:
-  addr: localhost:80
+  addr: :5000
   headers:
     X-Content-Type-Options: [nosniff]
+  tls:
+    certificate: /certs/domain.crt
+    key: /certs/domain.key
+health:
+  storagedriver:
+    enabled: true
+    interval: 10s
+    threshold: 3
