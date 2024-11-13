@@ -1,0 +1,21 @@
+version: 0.1
+log:
+  level: info
+  formatter: text
+  fields:
+    service: registry
+    environment: production
+
+storage:
+  filesystem:
+    rootdirectory: /var/lib/registry
+    maxthreads: 100
+  delete:
+    enabled: true
+  cache:
+    blobdescriptor: inmemory
+
+http:
+  addr: localhost:80
+  headers:
+    X-Content-Type-Options: [nosniff]
